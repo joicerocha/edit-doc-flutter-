@@ -1,30 +1,41 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// Teste básico do app: abre a tela de Login e confere a validação do formulário.
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:provider/provider.dart';
 
 import 'package:edit_doc_flutter/main.dart';
+import 'package:edit_doc_flutter/viewmodels/auth_viewmodel.dart';
+
+// O MeuApp lê o AuthViewModel, então precisa do Provider por cima
+// (igual ao que o main() faz).
+Widget _criarApp() {
+  return ChangeNotifierProvider<AuthViewModel>(
+    create: (_) => AuthViewModel(),
+    child: const MeuApp(),
+  );
+}
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Abre a tela de Login', (WidgetTester tester) async {
+    await tester.pumpWidget(_criarApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('DocReader'), findsOneWidget);
+    expect(find.text('Entrar'), findsOneWidget);
+    expect(find.text('Ainda não tem conta? Cadastre-se'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  testWidgets('Login vazio mostra as mensagens de validação',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(_criarApp());
+
+    // Garante que o botão está visível na tela de teste antes de tocar
+    await tester.ensureVisible(find.text('Entrar'));
+    await tester.tap(find.text('Entrar'));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Informe seu e-mail'), findsOneWidget);
+    expect(find.text('A senha deve ter pelo menos 6 caracteres'),
+        findsOneWidget);
   });
 }
