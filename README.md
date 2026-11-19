@@ -2,7 +2,7 @@
  
 Nesta fase eu peguei o app que fiz no DartPad (Login, Cadastro e Home), que estava todo em um arquivo só, e organizei na arquitetura MVVM. O app continua funcionando do mesmo jeito, só que agora dividido em pastas.
  
-## 1. Onde cada coisa ficou
+## 1. Onde cada coisa ficou apos a divisão
  
 | O que era no DartPad | Onde ficou agora |
 |---|---|
@@ -15,7 +15,7 @@ Nesta fase eu peguei o app que fiz no DartPad (Login, Cadastro e Home), que esta
 | Funções visuais (`_gradiente`, `_decoracao`, `_estiloBotao`, `_barra`, `_TituloSecao`) e `nomeDesenvolvedor` | `utils/componentes.dart` |
 | `main()`, `MeuApp` e as rotas | `main.dart` |
  
-## 2. O que precisei mudar ao dividir o arquivo
+## 2. O que foi preciso mudar ao dividir o arquivo
  
 - **Nomes com `_`:** no Dart, o `_` deixa o nome privado dentro do arquivo. Como as funções visuais (`gradiente`, `decoracao`, `estiloBotao`, `barra` e `TituloSecao`) passaram a ser usadas em várias telas, tirei o `_` para elas ficarem públicas. O `_modoDoTema` continuou privado porque só o ViewModel usa.
 - **Construtores:** as telas continuam com construtor `const` e `super.key`, só mudei os nomes. O `TituloSecao` ganhou `{super.key}`. Também criei a classe `PreferenciasSalvas` para o ViewModel entregar o tema e as notificações para a Home.
