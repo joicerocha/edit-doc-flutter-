@@ -1,8 +1,9 @@
 # DocReader: Migração para MVVM (Fase 1)
  
-Nesta fase eu peguei o app que fiz no DartPad (Login, Cadastro e Home), que estava todo em um arquivo só, e organizei na arquitetura MVVM. O app continua funcionando do mesmo jeito, só que agora dividido em pastas.
+Seguindo a arquitetura MVVM, nesta fase foi feita a organização do código que antes estava feito no DartPad (Login, Cadastro e Home) e que estava todo em um arquivo só.
+O app continua funcionando do mesmo jeito, só que agora dividido em pastas.
  
-## 1. Onde cada coisa ficou apos a divisão
+## 1. Onde cada coisa ficou após a divisão
  
 | O que era no DartPad | Onde ficou agora |
 |---|---|
