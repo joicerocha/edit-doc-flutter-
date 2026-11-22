@@ -11,10 +11,10 @@ class PreferenciasSalvas {
   const PreferenciasSalvas({this.tema, this.notificacoes});
 }
 
-/// Autenticação, cadastro e carregamento de preferências.
+/// Autenticação, cadastro, sessão e preferências.
 /// Aqui ficam o ESTADO e as REGRAS; as telas só desenham.
 class AuthViewModel extends ChangeNotifier {
-  // ---------- Tema do app (antes era o temaNotifier global) ----------
+  // ---------- Tema do app ----------
   ThemeMode themeMode = ThemeMode.light;
 
   ThemeMode _modoDoTema(String? tema) =>
@@ -30,6 +30,19 @@ class AuthViewModel extends ChangeNotifier {
   String tema = 'Claro';
   bool notificacoes = true;
   bool salvando = false;
+
+  /// Chamado no main() antes de abrir o app:
+  /// lê o tema salvo e restaura a sessão do usuário logado (se houver).
+  Future<void> iniciar() async {
+    final temaSalvo = await ServicoPreferencias.lerString('tema');
+    if (temaSalvo != null) themeMode = _modoDoTema(temaSalvo);
+
+    final emailSessao = await ServicoPreferencias.lerSessao();
+    if (emailSessao != null) {
+      usuarioLogado = await BancoDadosLocal.buscarUsuarioPorEmail(emailSessao);
+    }
+    notifyListeners();
+  }
 
   /// Zera as escolhas do formulário ao abrir a tela de cadastro.
   void iniciarCadastro() {
@@ -48,6 +61,17 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Alterna entre claro e escuro e salva a escolha.
+  Future<void> alternarTema() async {
+    themeMode =
+        themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    notifyListeners();
+    await ServicoPreferencias.salvarString(
+      'tema',
+      themeMode == ThemeMode.dark ? 'Escuro' : 'Claro',
+    );
+  }
+
   /// Retorna true se o login deu certo.
   Future<bool> login(String email, String senha) async {
     carregando = true;
@@ -62,6 +86,8 @@ class AuthViewModel extends ChangeNotifier {
 
     final temaSalvo = await ServicoPreferencias.lerString('tema');
     if (temaSalvo != null) themeMode = _modoDoTema(temaSalvo);
+
+    await ServicoPreferencias.salvarSessao(usuario.email);
 
     usuarioLogado = usuario;
     carregando = false;
@@ -78,25 +104,20 @@ class AuthViewModel extends ChangeNotifier {
     salvando = true;
     notifyListeners();
 
-    // 1) Grava o usuário no banco local (assíncrono)
     final inserido = await BancoDadosLocal.inserirUsuario(
       nome: nome,
       email: email,
       senha: senha,
     );
 
-    // 2) E-mail repetido -> interrompe
     if (!inserido) {
       salvando = false;
       notifyListeners();
       return false;
     }
 
-    // 3) Grava as preferências (chave-valor)
     await ServicoPreferencias.salvarString('tema', tema);
     await ServicoPreferencias.salvarBool('notificacoes', notificacoes);
-
-    // 4) Aplica o tema escolhido na hora
     themeMode = _modoDoTema(tema);
 
     salvando = false;
@@ -104,9 +125,10 @@ class AuthViewModel extends ChangeNotifier {
     return true;
   }
 
-  void logout() {
+  Future<void> logout() async {
     usuarioLogado = null;
     notifyListeners();
+    await ServicoPreferencias.limparSessao();
   }
 
   // ---------- Usados pela Home ----------

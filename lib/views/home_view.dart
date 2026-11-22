@@ -132,6 +132,11 @@ class HomeView extends StatelessWidget {
         'Painel',
         acoes: [
           IconButton(
+            icon: const Icon(Icons.brightness_6_outlined),
+            tooltip: 'Alternar tema',
+            onPressed: () => context.read<AuthViewModel>().alternarTema(),
+          ),
+          IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Sair',
             onPressed: () {
@@ -193,9 +198,10 @@ class HomeView extends StatelessWidget {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 4),
@@ -333,6 +339,15 @@ class HomeView extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
+                // Acesso ao editor de documentos (rota /editor)
+                ElevatedButton.icon(
+                  style: estiloBotao(context),
+                  onPressed: () => Navigator.pushNamed(context, '/editor'),
+                  icon: const Icon(Icons.description_outlined),
+                  label: const Text('Abrir meus documentos'),
+                ),
+                const SizedBox(height: 16),
+
                 // Dica
                 Container(
                   padding: const EdgeInsets.all(14),
@@ -355,6 +370,7 @@ class HomeView extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
             ),
           ),
         ],
